@@ -24,16 +24,16 @@ class CardSet(db.Model):
 
 class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    word = db.Column(db.String(100), nullable=False)
-    translation = db.Column(db.String(100), nullable=False)
+    word_eng = db.Column(db.String(100), nullable=False)
+    word_rus = db.Column(db.String(100), nullable=False)
     card_set_id = db.Column(db.Integer, db.ForeignKey('card_set.id'), nullable=False)
     card_set = db.relationship('CardSet', backref='cards')
 
 
 class ReadyCard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    word = db.Column(db.String(100), nullable=False)
-    translation = db.Column(db.String(100), nullable=False)
+    word_eng = db.Column(db.String(100), nullable=False)
+    word_rus = db.Column(db.String(100), nullable=False)
     ready_set_id = db.Column(db.Integer, db.ForeignKey('ready_card_set.id'), nullable=False)
 
     ready_set = db.relationship('ReadyCardSet', backref='cards')
@@ -46,6 +46,18 @@ class ReadyCardSet(db.Model):
     image_path = db.Column(db.String(200), default='/img/sets/default_set.png')
 
 
+# class Tests(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     test_id = db.Column(db.Integer, unique=True)
+#     name = db.Column(db.String(100), nullable=False)
+
+# class ReadyTest(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     word = db.Column(db.String(100), nullable=False)
+#     translation = db.Column(db.String(100), nullable=False)
+#     ready_test_id = db.Column(db.Integer, db.ForeignKey('ready_test.id'), nullable=False)
+#
+#     ready_test = db.relationship('ReadyTest', backref='cards')
 
 
 @app.route('/')
@@ -104,6 +116,11 @@ def user_profile(login, id):
         cards = Card.query.filter_by(card_set_id=card_set.id).all()
         all_cards.extend(cards)
 
+    # all_tests = []
+    # for test_set in user_card_sets:
+    #     cards = Card.query.filter_by(card_set_id=card_set.id).all()
+    #     all_cards.extend(cards)
+
     return render_template('user_page.html', login=login, cards=all_cards)
 
 @app.route('/card')
@@ -118,7 +135,6 @@ def new_card():
     ready_sets = ReadyCardSet.query.all()
 
     return render_template('new_card.html', ready_sets=ready_sets)
-
 
 
 

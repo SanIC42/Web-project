@@ -30,5 +30,26 @@
             <img src="/static/img/plus.png" alt="Добавить карточки">
         </a>
     </div>
+
+
+    <div class="section">
+        <h2>Мои тесты:</h2>
+        {% if cards %}
+            <ul class="card-list">
+                {% for card in cards %}
+                    <li>{{ card.word }} - {{ card.translation }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty">У тебя пока нет тестов. Добавь готовые или создай свои</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>Добавить тесты:</h2>
+        <a href="/new_card" class="add-card">
+            <img src="/static/img/plus.png" alt="Добавить карточки">
+        </a>
+    </div>
 </body>
 </html>

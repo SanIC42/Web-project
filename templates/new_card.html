@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Добавление карточки</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Выбери набор карточек</h1>
+
+        <div class="sets-container">
+            {% for set in ready_sets %}
+            <div class="set-card">
+                <img src="{{ set.image_path }}" alt="{{ set.name }}" class="set-image"
+                     onerror="this.src='/static/img/default_set.png'">
+                <div class="set-info">
+                    <h3 class="set-name">{{ set.name }}</h3>
+                    <form action="/add_set/{{ set.id }}" method="POST">
+                        <button type="submit" class="btn">➕ Добавить</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

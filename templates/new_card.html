@@ -18,9 +18,9 @@
                      onerror="this.src='/static/img/default_set.png'">
                 <div class="set-info">
                     <h3 class="set-name">{{ set.name }}</h3>
-                    <form action="/add_set/{{ set.id }}" method="POST">
+                    <a href="{{ url_for('add_set', set_id=set.id) }}" name="set_id" method="POST">
                         <button type="submit" class="btn">➕ Добавить</button>
-                    </form>
+                    </a>
                 </div>
             </div>
             {% endfor %}

@@ -14,38 +14,30 @@ class User(db.Model):
     login = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
 
-
 class CardSet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', backref='card_sets')
-
 
 class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    word = db.Column(db.String(100), nullable=False)
-    translation = db.Column(db.String(100), nullable=False)
+    word_eng = db.Column(db.String(100), nullable=False)
+    word_rus = db.Column(db.String(100), nullable=False)
     card_set_id = db.Column(db.Integer, db.ForeignKey('card_set.id'), nullable=False)
-    card_set = db.relationship('CardSet', backref='cards')
-
 
 class ReadyCard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    word = db.Column(db.String(100), nullable=False)
-    translation = db.Column(db.String(100), nullable=False)
+    word_eng = db.Column(db.String(100), nullable=False)
+    word_rus = db.Column(db.String(100), nullable=False)
     ready_set_id = db.Column(db.Integer, db.ForeignKey('ready_card_set.id'), nullable=False)
 
     ready_set = db.relationship('ReadyCardSet', backref='cards')
-
 
 class ReadyCardSet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200))
     image_path = db.Column(db.String(200), default='/img/sets/default_set.png')
-
-
 
 
 @app.route('/')
@@ -111,15 +103,19 @@ def card():
     return render_template('card.html')
 
 
-@app.route('/new_card')
+@app.route('/new_card', methods=['GET'])
 def new_card():
     if 'user' not in session:
         return "Ты не авторизован<a href='/login'>Войди</a>"
     ready_sets = ReadyCardSet.query.all()
-
     return render_template('new_card.html', ready_sets=ready_sets)
 
-
+# @app.route('/add_set/<int: set_id>')
+# def add_set(set_id):
+#     if 'user' not in session:
+#         return "Сначала пройдите авторизацию <a href='/login'>Войти</a>"
+#     ready_user_set = CardSet()
+#     db.session.add()
 
 
 def main():

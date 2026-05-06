@@ -91,7 +91,6 @@ def user_profile(login, id):
 
     user_card_sets = CardSet.query.filter_by(user_id=id).all()
 
-    # Передаем их в шаблон под именем card_sets
     return render_template('user_page.html', login=login, card_sets=user_card_sets)
 
 

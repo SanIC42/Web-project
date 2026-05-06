@@ -35,7 +35,7 @@ body {
     flex-wrap: wrap;
     gap: 20px;
     justify-content: flex-start;
-    margin-top: 30px;
+    margin: 20px 0;
 }
 
 .set-card {
@@ -62,6 +62,15 @@ body {
     margin: 0 0 10px 0;
     color: #2c3e50;
 }
+.section {
+    margin-bottom: 40px;
+}
+
+.section h2 {
+    margin-bottom: 20px;
+    color: #444;
+    font-size: 24px;
+}
 
 .btn {
     background: #3498db;
@@ -74,4 +83,30 @@ body {
 
 .btn:hover {
     background: #2980b9;
+}
+.message {
+    padding: 20px;
+    margin: 30px 0;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.message-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.message h2 {
+    margin-bottom: 15px;
+}
+
+.message p {
+    margin: 10px 0;
 }

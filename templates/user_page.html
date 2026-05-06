@@ -6,22 +6,30 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Мои карточки</title>
-    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
+
 <body>
     <h1 class="greeting">Здравствуй, {{ login }}!</h1>
 
     <div class="section">
         <h2>Мои карточки:</h2>
-        {% if cards %}
-            <ul class="card-list">
-                {% for card in cards %}
-                    <li>{{ card.word }} - {{ card.translation }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="empty">У тебя пока нет карточек. Добавь готовый набор или создай свои</p>
-        {% endif %}
+        <div class="sets-container">
+            {% for card_set in card_sets %}
+            <div class="set-card">
+                <img src="{{ card_set.image_path or '/static/img/sets/default_set.png' }}"
+                     alt="{{ card_set.name }}"
+                     class="set-image"
+                     onerror="this.src='/static/img/sets/default_set.png'">
+                <div class="set-info">
+                    <h3 class="set-name">{{ card_set.name }}</h3>
+                </div>
+            </div>
+            {% else %}
+            <p class="empty-message">У тебя пока нет карточек. Добавь готовый набор!</p>
+            {% endfor %}
+        </div>
     </div>
 
     <div class="section">

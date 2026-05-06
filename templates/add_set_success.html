@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Новое собрание</title>
+</head>
+<body>
+    <div class="container">
+        <div class="message message-success">
+            <h2>Успешно!</h2>
+            <p>Набор "<strong>{{ set_name }}</strong>" добавлен в твою коллекцию!</p>
+        </div>
+
+        <div class="nav-links">
+            <a href="/new_card" class="btn">Добавить ещё</a>
+            <a href="/user/{{ session['user'] }}/{{ session['user_id'] }}" class="btn">Мои карточки</a>
+        </div>
+    </div>
+</body>
+</html>

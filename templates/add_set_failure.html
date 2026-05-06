@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Уже есть</title>
+</head>
+<body>
+    <div class="container">
+        <div class="message message-error">
+            <h2>Ошибка!</h2>
+            <p>Набор "<strong>{{ set_name }}</strong>" уже есть в твоей коллекции!</p>
+            <p>Ты не можешь добавить один и тот же набор дважды.</p>
+        </div>
+
+        <div class="nav-links">
+            <a href="/new_card" class="btn">Выбрать другой набор</a>
+            <a href="/user/{{ session['user'] }}/{{ session['user_id'] }}" class="btn">Мои карточки</a>
+        </div>
+    </div>
+</body>
+</html>

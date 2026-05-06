@@ -51,11 +51,6 @@ def index():
     return render_template('main_page.html')
 
 
-@app.route('/odd_even')
-def odd_even():
-    return render_template('odd_even.html', number=2)
-
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':

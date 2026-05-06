@@ -46,6 +46,12 @@ class ReadyCardSet(db.Model):
     image_path = db.Column(db.String(200), default='/img/sets/default_set.png')
 
 
+@app.route('/logout')
+def logout():
+    session['user'] = None
+    return redirect("/")
+
+
 @app.route('/')
 def index():
     return render_template('main_page.html')

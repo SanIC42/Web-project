@@ -1,17 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Тренажёр по английскому</title>
-    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_page.css') }}">
 </head>
 <body>
-<h1 align="center">Сайт-тренажёр по английскому</h1>
-<a href="http://127.0.0.1:5000/register">Регистрация</a>
-<a href="http://127.0.0.1:5000/login">Вход</a>
-<a href="http://127.0.0.1:5000/card">Попробовать карточку</a>
+    <div class="main-container">
+        <h1 class="main-title">Сайт-тренажёр по английскому</h1>
+        <p class="subtitle">Учи слова эффективно и быстро</p>
+
+        <div class="button-group">
+            <a href="{{ url_for('register') }}" class="btn btn-primary">Регистрация</a>
+            <a href="{{ url_for('login') }}" class="btn btn-primary">Вход</a>
+            <hr>
+            <a href="{{ url_for('card') }}" class="btn btn-secondary">Попробовать карточку</a>
+        </div>
+    </div>
 </body>
 </html>

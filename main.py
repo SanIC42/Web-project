@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, session
+from flask import Flask, render_template, redirect, url_for, request, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -64,14 +64,15 @@ def register():
         password = request.form.get('password')
         existing_user = User.query.filter_by(login=login).first()
         if existing_user:
-            return "Такой логин уже существует <a href='/register'>Назад</a>"
+            flash('Такой логин уже существует')  # Используем flash
+            return redirect(url_for('register'))
         hashed_password = generate_password_hash(password)
 
         new_user = User(login=login, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
 
-        return "Регистрация успешна <a href='/login'>Войти</a>"
+        return redirect('/login')
     return render_template('registration.html')
 
 
@@ -83,9 +84,10 @@ def login():
         user = User.query.filter_by(login=login).first()
         if user and check_password_hash(user.password, password):
             session['user'] = login
-            return redirect(f'/user/{user.login}/{user.id}')
+            return redirect(url_for('user_profile', login=user.login, id=user.id))
         else:
-            return "Неверный логин или пароль <a href='/login'>Попробовать снова</a>"
+            flash('Неверный логин или пароль', 'danger')
+            return redirect(url_for('login'))  # Перезагружаем страницу входа
 
     return render_template('login.html')
 
@@ -114,27 +116,29 @@ def new_card():
         return redirect(f'/add_set/{request.form.get('set_id')}')
     return render_template('new_card.html', ready_sets=ready_sets)
 
-@app.route('/add_set/<int:set_id>')
+@app.route('/add_set/<int:set_id>', methods=['POST'])
 def add_set(set_id):
     if 'user' not in session:
         return redirect(url_for('login'))
 
     user = User.query.filter_by(login=session['user']).first()
     ready_set = ReadyCardSet.query.get(set_id)
+    try:
+        new_user_set = CardSet(name=ready_set.name, user_id=user.id)
+        db.session.add(new_user_set)
+        db.session.flush()
 
-    new_user_set = CardSet(name=ready_set.name, user_id=user.id)
-    db.session.add(new_user_set)
-    db.session.flush()
+        for rc in ready_set.cards:
+            new_card = Card(
+                word_eng=rc.word_eng,
+                word_rus=rc.word_rus,
+                card_set_id=new_user_set.id
+            )
+            db.session.add(new_card)
 
-    for rc in ready_set.cards:
-        new_card = Card(
-            word_eng=rc.word_eng,
-            word_rus=rc.word_rus,
-            card_set_id=new_user_set.id
-        )
-        db.session.add(new_card)
-
-    db.session.commit()
+        db.session.commit()
+    except:
+        db.session.rollback()
     return redirect(url_for('user_profile', login=user.login, id=user.id))
 
 

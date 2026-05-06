@@ -2,25 +2,30 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Добавление карточки</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавление набора</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/new_card.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Выбери набор карточек</h1>
-        <div class="sets-container">
+        <div class="header">
+            <a href="javascript:history.back()" class="back-link">← Назад</a>
+            <h1>Готовые наборы</h1>
+        </div>
+
+        <div class="sets-grid">
             {% for set in ready_sets %}
-            <div class="set-card">
-                <img src="{{ set.image_path }}" alt="{{ set.name }}" class="set-image"
-                     onerror="this.src='/static/img/default_set.png'">
-                <div class="set-info">
-                    <h3 class="set-name">{{ set.name }}</h3>
-                    <a href="{{ url_for('add_set', set_id=set.id) }}" name="set_id" method="POST">
-                        <button type="submit" class="btn">➕ Добавить</button>
-                    </a>
+            <div class="set-item">
+                <div class="image-wrapper">
+                    <img src="{{ set.image_path }}" alt="{{ set.name }}"
+                         onerror="this.src='/static/img/default_set.png'">
+                </div>
+                <div class="set-content">
+                    <h3>{{ set.name }}</h3>
+                    <form action="{{ url_for('add_set', set_id=set.id) }}" method="POST">
+                        <button type="submit" class="add-btn">➕ Добавить</button>
+                    </form>
                 </div>
             </div>
             {% endfor %}

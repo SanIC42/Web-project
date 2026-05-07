@@ -155,6 +155,27 @@ def add_set(set_id):
 
     return render_template('add_set_success.html', set_name=ready_set.name)
 
+
+@app.route('/card_set/<int:set_id>')
+def card_set(set_id):
+    if 'user' not in session:
+        return "Сначала пройдите авторизацию <a href='/login'>Войти</a>"
+
+    card_set = CardSet.query.get_or_404(set_id)
+
+    if card_set.user_id != session.get('user_id'):
+        return "У вас нет доступа к этому набору"
+
+    cards = Card.query.filter_by(card_set_id=set_id).all()
+
+    return render_template('card_set.html',
+                           card_set=card_set,
+                           cards=cards,
+                           total_cards=len(cards))
+
+
+
+
 def create_ready_sets():
     with app.app_context():
         animals_set = ReadyCardSet(

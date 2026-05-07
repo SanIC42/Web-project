@@ -2,15 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Уже есть</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
-        <div class="message message-error">
-            <h2>Ошибка!</h2>
-            <p>Набор "<strong>{{ set_name }}</strong>" уже есть в твоей коллекции!</p>
-            <p>Ты не можешь добавить один и тот же набор дважды.</p>
-        </div>
+        <h2>Ошибка!</h2>
+        <p>Набор "<strong>{{ set_name }}</strong>" уже есть в твоей коллекции!</p>
+        <p>Ты не можешь добавить один и тот же набор дважды.</p>
 
         <div class="nav-links">
             <a href="/new_card" class="btn">Выбрать другой набор</a>

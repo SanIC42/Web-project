@@ -17,15 +17,17 @@
         <h2>Мои карточки:</h2>
         <div class="sets-container">
             {% for card_set in card_sets %}
-            <div class="set-card">
-                <img src="{{ card_set.image_path or '/static/img/sets/default_set.png' }}"
-                     alt="{{ card_set.name }}"
-                     class="set-image"
-                     onerror="this.src='/static/img/sets/default_set.png'">
-                <div class="set-info">
-                    <h3 class="set-name">{{ card_set.name }}</h3>
+            <a href="/card_set/{{ card_set.id }}">
+                <div class="set-card">
+                    <img src="{{ card_set.image_path or '/static/img/sets/default_set.png' }}"
+                         alt="{{ card_set.name }}"
+                         class="set-image"
+                         onerror="this.src='/static/img/sets/default_set.png'">
+                    <div class="set-info">
+                        <h3 class="set-name">{{ card_set.name }}</h3>
+                    </div>
                 </div>
-            </div>
+            </a>
             {% else %}
             <p class="empty-message">У тебя пока нет карточек. Добавь готовый набор!</p>
             {% endfor %}

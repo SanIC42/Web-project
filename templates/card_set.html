@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ card_set.name }} - изучение</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .study-container {
+            max-width: 600px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .card {
+            width: 400px;
+            height: 300px;
+            margin: 0 auto;
+            cursor: pointer;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 30px;
+            font-size: 18px;
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .counter {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="study-container">
+        <h1>{{ card_set.name }}</h1>
+
+        <div class="counter">
+            Карточка <span id="current-index">1</span> из <span id="total-count">{{ total_cards }}</span>
+        </div>
+
+        <div class="card" id="study-card" onclick="toggleCard()" style="background-color: #4CAF50; color: white;">
+            {{ cards[0].word if cards else 'Нет слов' }}
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="prevCard()">← Назад</button>
+            <button class="nav-btn" onclick="nextCard()">Вперёд →</button>
+        </div>
+
+        <a href="/user/{{ session.user }}/{{ session.user_id }}" class="back-link">← Вернуться</a>
+    </div>
+
+    <script>
+        const cards = [
+            {% for card in cards %}
+            { word: "{{ card.word }}", translation: "{{ card.translation }}" },
+            {% endfor %}
+        ];
+
+        let currentCard = 0;
+        let isShowingTranslation = false;
+        const totalCards = cards.length;
+        const cardElement = document.getElementById('study-card');
+
+        function updateCard() {
+            if (isShowingTranslation) {
+                cardElement.textContent = cards[currentCard].translation;
+                cardElement.style.backgroundColor = "#2196F3";
+            } else {
+                cardElement.textContent = cards[currentCard].word;
+                cardElement.style.backgroundColor = "#4CAF50";
+            }
+            document.getElementById('current-index').textContent = currentCard + 1;
+        }
+
+        function toggleCard() {
+            isShowingTranslation = !isShowingTranslation;
+            if (isShowingTranslation) {
+                cardElement.textContent = cards[currentCard].translation;
+                cardElement.style.backgroundColor = "#2196F3";
+            } else {
+                cardElement.textContent = cards[currentCard].word;
+                cardElement.style.backgroundColor = "#4CAF50";
+            }
+        }
+
+        function prevCard() {
+            currentCard--;
+            if (currentCard < 0) {
+                currentCard = totalCards - 1;
+            }
+            isShowingTranslation = false;
+            updateCard();
+        }
+
+        function nextCard() {
+            currentCard++;
+            if (currentCard >= totalCards) {
+                currentCard = 0;
+            }
+            isShowingTranslation = false;
+            updateCard();
+        }
+    </script>
+</body>
+</html>

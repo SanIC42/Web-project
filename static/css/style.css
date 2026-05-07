@@ -1,5 +1,6 @@
 body {
     font-family: Arial, sans-serif;
+    font-size: 30px;
 }
 
 .card-container {
@@ -30,6 +31,7 @@ body {
 .back {
     transform: rotateY(180deg);
 }
+
 .sets-container {
     display: flex;
     flex-wrap: wrap;
@@ -39,7 +41,7 @@ body {
 }
 
 .set-card {
-    width: 200px;
+    width: 350px;
     border: 1px solid #ddd;
     border-radius: 10px;
     overflow: hidden;
@@ -48,20 +50,21 @@ body {
 
 .set-image {
     width: 100%;
-    height: 200px;
+    height: 350px;
     object-fit: cover;
 }
 
 .set-info {
-    padding: 10px;
+    padding: 15px;
     text-align: center;
 }
 
 .set-name {
-    font-size: 18px;
-    margin: 0 0 10px 0;
+    font-size: 35px;
+    margin: 0 0 15px 0;
     color: #2c3e50;
 }
+
 .section {
     margin-bottom: 40px;
 }
@@ -69,21 +72,21 @@ body {
 .section h2 {
     margin-bottom: 20px;
     color: #444;
-    font-size: 24px;
+    font-size: 45px;
 }
 
 .btn {
-    background: #3498db;
+    background: #006400;
     color: white;
     border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
+    padding: 16px 32px;
+    border-radius: 10px;
     cursor: pointer;
+    font-size: 35px;
 }
 
-.btn:hover {
-    background: #2980b9;
 }
+
 .message {
     padding: 20px;
     margin: 30px 0;
@@ -105,8 +108,36 @@ body {
 
 .message h2 {
     margin-bottom: 15px;
+    font-size: 45px;
 }
 
 .message p {
     margin: 10px 0;
+    font-size: 35px;
+}
+.form-input {
+    font-size: 35px;
+    padding: 12px 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.form-input {
+    font-size: 35px;
+    padding: 12px 15px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+}
+
+form {
+    text-align: center;
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }

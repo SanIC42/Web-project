@@ -92,3 +92,8 @@ h1 {
 .add-btn:hover {
     background-color: #218838;
 }
+
+.description {
+    color: #777;
+    font-size: 15px;
+}

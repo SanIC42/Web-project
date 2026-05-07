@@ -48,7 +48,7 @@ class ReadyCardSet(db.Model):
 
 @app.route('/logout')
 def logout():
-    session['user'] = None
+    session.pop('user')
     return redirect("/")
 
 
@@ -139,6 +139,28 @@ def add_set(set_id):
         db.session.commit()
     except:
         db.session.rollback()
+    return redirect(url_for('user_profile', login=user.login, id=user.id))
+
+
+@app.route('/delete_set/<int:set_id>', methods=['POST'])
+def delete_set(set_id):
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(login=session['user']).first()
+    card_set = CardSet.query.get(set_id)
+
+    if card_set.user_id != user.id:
+        flash("У вас нет прав на удаление этого набора")
+        return redirect(url_for('user_profile', login=user.login, id=user.id))
+
+    for card in card_set.cards:
+        db.session.delete(card)
+
+    db.session.delete(card_set)
+    db.session.commit()
+    flash('Набор успешно удален!')
+
     return redirect(url_for('user_profile', login=user.login, id=user.id))
 
 

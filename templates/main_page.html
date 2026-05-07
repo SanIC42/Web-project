@@ -1,18 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Тренажёр по английскому</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сайт-тренажёр по английскому</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-<h1 align="center">Сайт-тренажёр по английскому</h1>
-<div style="text-align: center; font-size: 35px;">
-    <a href="http://127.0.0.1:5000/register" style="margin-right: 20px;">Регистрация</a>
-    <a href="http://127.0.0.1:5000/login">Вход</a>
-</div>
+    <div class="study-container" style="text-align: center; margin-top: 200px;">
+
+        <div style="background-image: url('/static/img/top_pattern_bg.jpg');
+            background-repeat: repeat;
+            padding: 20px 40px 20px 40px;
+            border: 5px dashed #105424;
+            border-radius: 30px;
+            display: inline-block;
+            width: auto;
+            min-width: 300px;">
+            <h1>Сайт-тренажёр по английскому</h1>
+            <div class="nav-buttons" style="justify-content: center; margin-top: 0;">
+                <a href="/login" class="main-btn" style="background-color: #006400; color: white; padding: 14px 40px; text-decoration: none; border-radius: 7px; display: inline-block; font-size: 24px;">Вход</a><br><br>
+                <a href="/register" class="main-btn" style="background-color: #006400; color: white; padding: 14px 40px; text-decoration: none; border-radius: 7px; display: inline-block; font-size: 24px;">Регистрация</a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

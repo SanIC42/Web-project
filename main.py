@@ -1,13 +1,20 @@
 from flask import Flask, render_template, redirect, url_for, request, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+import csv
+import io
+import os
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+UPLOAD_FOLDER = 'static/img/user_sets'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 db = SQLAlchemy(app)
 
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -19,7 +26,7 @@ class CardSet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    image_path = db.Column(db.String(200), default='/static/img/sets/default_set.png')  # Добавь эту строку
+    image_path = db.Column(db.String(200), default='/static/img/sets/default_set.png')
     user = db.relationship('User', backref='card_sets')
 
 
@@ -74,7 +81,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        return "Регистрация успешна <a href='/login'>Войти</a>"
+        return render_template('register_success.html')
     return render_template('registration.html')
 
 
@@ -174,6 +181,85 @@ def card_set(set_id):
                            total_cards=len(cards))
 
 
+@app.route('/upload_csv', methods=['POST'])
+def upload_csv():
+    if 'user' not in session:
+        return "Сначала пройдите авторизацию <a href='/login'>Войти</a>"
+
+    user_id = session.get('user_id')
+
+    # Получаем название набора из формы
+    set_name = request.form.get('set_name')
+    if not set_name:
+        return "Ошибка: не указано название набора"
+
+    # Получаем CSV файл
+    file = request.files.get('csv_file')
+    if not file or file.filename == '':
+        return "Ошибка: файл не выбран"
+
+    # Обработка картинки (необязательно)
+    image_path = '/static/img/sets/default_set.png'
+    image_file = request.files.get('set_image')
+
+    if image_file and image_file.filename != '':
+        # Сохраняем картинку
+        filename = secure_filename(f"user_{user_id}_{set_name}_{image_file.filename}")
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        image_file.save(filepath)
+        image_path = f'/{UPLOAD_FOLDER}/{filename}'
+
+    # Читаем CSV файл
+    try:
+        stream = io.TextIOWrapper(file.stream, encoding='utf-8')
+        csv_reader = csv.reader(stream, delimiter=';')
+        rows = list(csv_reader)
+
+        if not rows:
+            return "Ошибка: файл пуст"
+
+    except Exception as e:
+        return f"Ошибка при чтении CSV файла: {str(e)}"
+
+    new_set = CardSet(
+        name=set_name,
+        user_id=user_id,
+        image_path=image_path
+    )
+    db.session.add(new_set)
+    db.session.commit()
+
+    # Добавляем карточки
+    cards_added = 0
+    for row in rows:
+        if row and len(row) >= 2:
+            word = row[0].strip()
+            translation = row[1].strip()
+
+            if word and translation:
+                new_card = Card(
+                    word=word,
+                    translation=translation,
+                    card_set_id=new_set.id
+                )
+                db.session.add(new_card)
+                cards_added += 1
+
+    db.session.commit()
+
+    if cards_added == 0:
+        if image_path != '/static/img/sets/default_set.png':
+            try:
+                os.remove(image_path[1:])
+            except:
+                pass
+        db.session.delete(new_set)
+        db.session.commit()
+        return "Ошибка: в файле не найдено карточек. Проверьте формат (слово;перевод)"
+
+    return render_template('upload_success.html',
+                           set_name=set_name,
+                           cards_count=cards_added)
 
 
 def create_ready_sets():
@@ -220,12 +306,12 @@ def create_ready_sets():
             db.session.add(card)
 
         db.session.commit()
-        print("Готовые наборы с картинками созданы!")
+        print("Готовые наборы с картинками созданы")
 # with app.app_context():
 #      db.drop_all()
 #      db.create_all()
 #      create_ready_sets()
-#      print("База данных пересоздана!")
+#      print("База данных пересоздана")
 def main():
     app.run(debug=True)
 

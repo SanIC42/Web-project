@@ -1,4 +1,6 @@
 body {
+    background-image: url('/static/img/background_img.jpg');
+    background-repeat: repeat;
     font-family: Arial, sans-serif;
     font-size: 30px;
 }
@@ -140,4 +142,126 @@ form {
     background: white;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 400px;
+    margin-top: 15px;
+}
+
+.form-group {
+    width: 100%;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.form-file {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.form-file::-webkit-file-upload-button {
+    padding: 6px 12px;
+    margin-right: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.form-file::-webkit-file-upload-button:hover {
+    background-color: #45a049;
+}
+.form-group small {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.greeting-sticker {
+    background-image: url('/static/img/headers/header_orange.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    width: auto;
+    min-width: 500px;
+    margin-bottom: 30px;
+}
+
+.sticker-text {
+    text-align: center;
+    padding: 35px 80px;
+    margin: 0;
+    font-size: 32px;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    white-space: nowrap;
+}
+
+.sticker-text.orange {
+    font-color: black;
+    transform: rotate(-3deg);
+}
+
+.section-header {
+    display: inline-block;
+    margin-bottom: 25px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 400px;
+    height: 170px;
+}
+
+.section-header h2 {
+    margin: 0;
+    padding: 80px 0 0 45px;
+    font-size: 32px;
+    color: #5c3a21;
+    transform: rotate(8deg);
+    font-weight: bold;
+}
+
+.section-header.turquoise {
+    background-image: url('/static/img/headers/header_turquoise.png');
+}
+
+.section-header.lightgreen {
+    background-image: url('/static/img/headers/header_lightgreen.png');
+}
+
+.section-header.purple {
+    width: 450px;
+    background-image: url('/static/img/headers/header_purple.png');
+}
+
+.logout-link {
+    display: inline-block;
+    margin-top: 30px;
+    color: #666;
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+}
+
+.logout-link:hover {
+    background-color: #e0e0e0;
 }

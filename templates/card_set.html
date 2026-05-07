@@ -7,47 +7,60 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         .study-container {
-            max-width: 600px;
+            max-width: 900px;
             margin: 50px auto;
             text-align: center;
         }
 
+        .study-island {
+            background-image: url('/static/img/menu_pattern_bg-1.jpg');
+            background-repeat: repeat;
+            padding: 60px 40px;
+            border: 5px dashed #105424;
+            border-radius: 30px;
+            margin: 30px 0;
+        }
+
         .card {
-            width: 400px;
-            height: 300px;
+            width: 600px;
+            height: 450px;
             margin: 0 auto;
             cursor: pointer;
-            border-radius: 12px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 38px;
+            font-size: 42px;
             text-align: center;
-            padding: 20px;
+            padding: 30px;
             box-sizing: border-box;
         }
 
         .nav-buttons {
             display: flex;
-            gap: 20px;
+            gap: 30px;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 40px;
         }
 
         .nav-btn {
-            padding: 10px 30px;
-            font-size: 18px;
+            padding: 14px 40px;
+            font-size: 24px;
             background-color: #f0f0f0;
             color: #333;
             border: 1px solid #ddd;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
         }
 
         .counter {
-            margin-bottom: 20px;
-            font-size: 16px;
+            margin-bottom: 30px;
+            font-size: 22px;
             color: #666;
+            background-color: rgba(255, 255, 255, 0.85);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 30px;
         }
 
         .back-link {
@@ -55,6 +68,12 @@
             margin-top: 30px;
             color: #666;
             text-decoration: none;
+            font-size: 18px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 36px;
         }
     </style>
 </head>
@@ -62,17 +81,19 @@
     <div class="study-container">
         <h1>{{ card_set.name }}</h1>
 
-        <div class="counter">
-            Карточка <span id="current-index">1</span> из <span id="total-count">{{ total_cards }}</span>
-        </div>
+        <div class="study-island">
+            <div class="counter">
+                Карточка <span id="current-index">1</span> из <span id="total-count">{{ total_cards }}</span>
+            </div>
 
-        <div class="card" id="study-card" onclick="toggleCard()" style="background-color: #4CAF50; color: white;">
-            {{ cards[0].word if cards else 'Нет слов' }}
-        </div>
+            <div class="card" id="study-card" onclick="toggleCard()" style="background-color: #4CAF50; color: white;">
+                {{ cards[0].word if cards else 'Нет слов' }}
+            </div>
 
-        <div class="nav-buttons">
-            <button class="nav-btn" onclick="prevCard()">← Назад</button>
-            <button class="nav-btn" onclick="nextCard()">Вперёд →</button>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevCard()">← Назад</button>
+                <button class="nav-btn" onclick="nextCard()">Вперёд →</button>
+            </div>
         </div>
 
         <a href="/user/{{ session.user }}/{{ session.user_id }}" class="back-link">← Вернуться</a>
@@ -105,7 +126,7 @@
             isShowingTranslation = !isShowingTranslation;
             if (isShowingTranslation) {
                 cardElement.textContent = cards[currentCard].translation;
-                cardElement.style.backgroundColor = "#2196F3";
+                cardElement.style.backgroundColor = "#b964e5";
             } else {
                 cardElement.textContent = cards[currentCard].word;
                 cardElement.style.backgroundColor = "#4CAF50";

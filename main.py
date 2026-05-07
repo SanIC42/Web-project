@@ -1,13 +1,20 @@
-from flask import Flask, render_template, redirect, url_for, request, session, flash
+from flask import Flask, render_template, redirect, url_for, request, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+import csv
+import io
+import os
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+UPLOAD_FOLDER = 'static/img/user_sets'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 db = SQLAlchemy(app)
 
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -19,21 +26,23 @@ class CardSet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    image_path = db.Column(db.String(200), default='/static/img/sets/default_set.png')
     user = db.relationship('User', backref='card_sets')
+
 
 
 class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    word_eng = db.Column(db.String(100), nullable=False)
-    word_rus = db.Column(db.String(100), nullable=False)
+    word = db.Column(db.String(100), nullable=False)
+    translation = db.Column(db.String(100), nullable=False)
     card_set_id = db.Column(db.Integer, db.ForeignKey('card_set.id'), nullable=False)
     card_set = db.relationship('CardSet', backref='cards')
 
 
 class ReadyCard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    word_eng = db.Column(db.String(100), nullable=False)
-    word_rus = db.Column(db.String(100), nullable=False)
+    word = db.Column(db.String(100), nullable=False)
+    translation = db.Column(db.String(100), nullable=False)
     ready_set_id = db.Column(db.Integer, db.ForeignKey('ready_card_set.id'), nullable=False)
 
     ready_set = db.relationship('ReadyCardSet', backref='cards')
@@ -46,15 +55,16 @@ class ReadyCardSet(db.Model):
     image_path = db.Column(db.String(200), default='/img/sets/default_set.png')
 
 
-@app.route('/logout')
-def logout():
-    session.pop('user')
-    return redirect("/")
 
 
 @app.route('/')
 def index():
     return render_template('main_page.html')
+
+
+@app.route('/odd_even')
+def odd_even():
+    return render_template('odd_even.html', number=2)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -64,15 +74,14 @@ def register():
         password = request.form.get('password')
         existing_user = User.query.filter_by(login=login).first()
         if existing_user:
-            flash('Такой логин уже существует')  # Используем flash
-            return redirect(url_for('register'))
+            return "Такой логин уже существует <a href='/register'>Назад</a>"
         hashed_password = generate_password_hash(password)
 
         new_user = User(login=login, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
 
-        return redirect('/login')
+        return render_template('register_success.html')
     return render_template('registration.html')
 
 
@@ -84,79 +93,225 @@ def login():
         user = User.query.filter_by(login=login).first()
         if user and check_password_hash(user.password, password):
             session['user'] = login
-            return redirect(url_for('user_profile', login=user.login, id=user.id))
+            session['user_id'] = user.id
+            return redirect(f'/user/{user.login}/{user.id}')
         else:
-            flash('Неверный логин или пароль', 'danger')
-            return redirect(url_for('login'))  # Перезагружаем страницу входа
+            return "Неверный логин или пароль <a href='/login'>Попробовать снова</a>"
 
+    # Форма входа
     return render_template('login.html')
 
 
 @app.route('/user/<string:login>/<int:id>')
+@app.route('/user/<string:login>/<int:id>')
 def user_profile(login, id):
-    if 'user' not in session or session['user'] != login:
-        return redirect(url_for('login'))
-
+    if 'user' not in session:
+        return "Сначала пройдите авторизацию <a href='/login'>Войти</a>"
+    if session['user'] != login:
+        return "Логин не совпадает <a href='/'>На главную</a>"
     user_card_sets = CardSet.query.filter_by(user_id=id).all()
 
     return render_template('user_page.html', login=login, card_sets=user_card_sets)
-
 
 @app.route('/card')
 def card():
     return render_template('card.html')
 
 
-@app.route('/new_card', methods=['GET', 'POST'])
+@app.route('/new_card')
 def new_card():
     if 'user' not in session:
-        return redirect(url_for('login'))
+        return "Ты не авторизован<a href='/login'>Войди</a>"
     ready_sets = ReadyCardSet.query.all()
-    if request.method == 'POST':
-        return redirect(f'/add_set/{request.form.get('set_id')}')
+
     return render_template('new_card.html', ready_sets=ready_sets)
+
 
 @app.route('/add_set/<int:set_id>', methods=['POST'])
 def add_set(set_id):
     if 'user' not in session:
-        return redirect(url_for('login'))
-
-    user = User.query.filter_by(login=session['user']).first()
+        return "Сначала пройдите авторизацию <a href='/login'>Войти</a>"
+    user_id = session.get('user_id')
     ready_set = ReadyCardSet.query.get(set_id)
-    try:
-        new_user_set = CardSet(name=ready_set.name, user_id=user.id)
-        db.session.add(new_user_set)
-        db.session.flush()
 
-        for rc in ready_set.cards:
-            new_card = Card(
-                word_eng=rc.word_eng,
-                word_rus=rc.word_rus,
-                card_set_id=new_user_set.id
-            )
-            db.session.add(new_card)
+    existing_set = CardSet.query.filter_by(
+        name=ready_set.name,
+        user_id=user_id
+    ).first()
 
-        db.session.commit()
-    except:
-        db.session.rollback()
-    return redirect(url_for('user_profile', login=user.login, id=user.id))
+    if existing_set:
+        return render_template('add_set_failure.html', set_name=ready_set.name)
 
-
-@app.route('/delete_set/<int:set_id>', methods=['POST'])
-def delete_set(set_id):
-    if 'user' not in session:
-        return redirect(url_for('login'))
-
-    user = User.query.filter_by(login=session['user']).first()
-    card_set = CardSet.query.get(set_id)
-    for card in card_set.cards:
-        db.session.delete(card)
-    db.session.delete(card_set)
+    new_set = CardSet(
+        name=ready_set.name,
+        user_id=user_id,
+        image_path=ready_set.image_path
+    )
+    db.session.add(new_set)
     db.session.commit()
 
-    return redirect(url_for('user_profile', login=user.login, id=user.id))
+    for ready_card in ready_set.cards:
+        new_card = Card(
+            word=ready_card.word,
+            translation=ready_card.translation,
+            card_set_id=new_set.id
+        )
+        db.session.add(new_card)
+
+    db.session.commit()
+
+    return render_template('add_set_success.html', set_name=ready_set.name)
 
 
+@app.route('/card_set/<int:set_id>')
+def card_set(set_id):
+    if 'user' not in session:
+        return "Сначала пройдите авторизацию <a href='/login'>Войти</a>"
+
+    card_set = CardSet.query.get_or_404(set_id)
+
+    if card_set.user_id != session.get('user_id'):
+        return "У вас нет доступа к этому набору"
+
+    cards = Card.query.filter_by(card_set_id=set_id).all()
+
+    return render_template('card_set.html',
+                           card_set=card_set,
+                           cards=cards,
+                           total_cards=len(cards))
+
+
+@app.route('/upload_csv', methods=['POST'])
+def upload_csv():
+    if 'user' not in session:
+        return "Сначала пройдите авторизацию <a href='/login'>Войти</a>"
+
+    user_id = session.get('user_id')
+
+    # Получаем название набора из формы
+    set_name = request.form.get('set_name')
+    if not set_name:
+        return "Ошибка: не указано название набора"
+
+    # Получаем CSV файл
+    file = request.files.get('csv_file')
+    if not file or file.filename == '':
+        return "Ошибка: файл не выбран"
+
+    # Обработка картинки (необязательно)
+    image_path = '/static/img/sets/default_set.png'
+    image_file = request.files.get('set_image')
+
+    if image_file and image_file.filename != '':
+        # Сохраняем картинку
+        filename = secure_filename(f"user_{user_id}_{set_name}_{image_file.filename}")
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        image_file.save(filepath)
+        image_path = f'/{UPLOAD_FOLDER}/{filename}'
+
+    # Читаем CSV файл
+    try:
+        stream = io.TextIOWrapper(file.stream, encoding='utf-8')
+        csv_reader = csv.reader(stream, delimiter=';')
+        rows = list(csv_reader)
+
+        if not rows:
+            return "Ошибка: файл пуст"
+
+    except Exception as e:
+        return f"Ошибка при чтении CSV файла: {str(e)}"
+
+    new_set = CardSet(
+        name=set_name,
+        user_id=user_id,
+        image_path=image_path
+    )
+    db.session.add(new_set)
+    db.session.commit()
+
+    # Добавляем карточки
+    cards_added = 0
+    for row in rows:
+        if row and len(row) >= 2:
+            word = row[0].strip()
+            translation = row[1].strip()
+
+            if word and translation:
+                new_card = Card(
+                    word=word,
+                    translation=translation,
+                    card_set_id=new_set.id
+                )
+                db.session.add(new_card)
+                cards_added += 1
+
+    db.session.commit()
+
+    if cards_added == 0:
+        if image_path != '/static/img/sets/default_set.png':
+            try:
+                os.remove(image_path[1:])
+            except:
+                pass
+        db.session.delete(new_set)
+        db.session.commit()
+        return "Ошибка: в файле не найдено карточек. Проверьте формат (слово;перевод)"
+
+    return render_template('upload_success.html',
+                           set_name=set_name,
+                           cards_count=cards_added)
+
+
+def create_ready_sets():
+    with app.app_context():
+        animals_set = ReadyCardSet(
+            name="Животные",
+            description="Собаки, кошки и другие животные",
+            image_path="/static/img/sets/animals.png"
+        )
+        db.session.add(animals_set)
+        db.session.commit()
+        animals = [
+            ("dog", "собака"), ("cat", "кошка"), ("cow", "корова"),
+            ("horse", "лошадь"), ("bird", "птица"), ("fish", "рыба")
+        ]
+        for word, trans in animals:
+            card = ReadyCard(word=word, translation=trans, ready_set_id=animals_set.id)
+            db.session.add(card)
+        colors_set = ReadyCardSet(
+            name="Цвета",
+            description="Основные цвета радуги",
+            image_path="/static/img/sets/colours.png"
+        )
+        db.session.add(colors_set)
+        db.session.commit()
+
+        colors = [("red", "красный"), ("blue", "синий"), ("green", "зелёный"),
+                  ("yellow", "жёлтый"), ("black", "чёрный"), ("white", "белый")]
+        for word, trans in colors:
+            card = ReadyCard(word=word, translation=trans, ready_set_id=colors_set.id)
+            db.session.add(card)
+        food_set = ReadyCardSet(
+            name="Еда",
+            description="Продукты и блюда",
+            image_path="/static/img/sets/food.png"
+        )
+        db.session.add(food_set)
+        db.session.commit()
+
+        food = [("apple", "яблоко"), ("bread", "хлеб"), ("water", "вода"),
+                ("meat", "мясо"), ("soup", "суп"), ("cake", "торт")]
+        for word, trans in food:
+            card = ReadyCard(word=word, translation=trans, ready_set_id=food_set.id)
+            db.session.add(card)
+
+        db.session.commit()
+        print("Готовые наборы с картинками созданы")
+# with app.app_context():
+#      db.drop_all()
+#      db.create_all()
+#      create_ready_sets()
+#      print("База данных пересоздана")
 def main():
     app.run(debug=True)
 
